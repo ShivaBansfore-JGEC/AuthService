@@ -26,7 +26,6 @@ const create = async (req, res) => {
 }
 
 const signIn = async (req, res) => {
-    console.log('called:', req.body)
     try{
         const response = await userService.singIn(req.body.email, req.body.password);
         return res.status(200).json({
@@ -36,12 +35,37 @@ const signIn = async (req, res) => {
             message: 'successfully signin'
         });
     }catch(error){
-        console.log('something went wrong in user controller!', error)
-        throw error;
+        return res.status(500).json({
+            data: {},
+            success: false,
+            message: 'signin failed!',
+            error: error
+        })
+    }
+}
+
+const isAuthenticated = async (req, res) => {
+    try{
+      const token = req.headers['x-access-token'];
+      const response = await userService.isAuthenticated(token);
+      return res.status(200).json({
+        success: true,
+        data: response,
+        err: {},
+        message: 'Successfully authenticated!'
+      })
+    }catch(error){
+        return res.status(500).json({
+            data: {},
+            success: false,
+            message: 'authentication failed',
+            error: error
+        })
     }
 }
 
 module.exports = {
     create,
-    signIn
+    signIn,
+    isAuthenticated
 }
